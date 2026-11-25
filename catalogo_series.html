@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Meu Catálogo de Séries</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#fff7fb;color:#382433}header{background:#f4d5e4;padding:24px;text-align:center}h1{color:#87375b;margin:0}main{max-width:1000px;margin:auto;padding:16px}
+.stats{display:flex;flex-wrap:wrap;gap:10px}.stat{flex:1 1 130px;background:#fff;border:1px solid #edd4e1;border-radius:12px;padding:14px}.stat b{font-size:24px;color:#b64f7c}
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:16px 0}input,select{padding:11px;border:1px solid #dcbccc;border-radius:9px;font-size:16px;background:#fff}
+.table-wrap{overflow-x:auto;background:white;border-radius:12px;border:1px solid #edd4e1}table{width:100%;min-width:780px;border-collapse:collapse}th,td{padding:10px;text-align:left;border-bottom:1px solid #f0dfe8}th{background:#fae8f1;color:#813658}td select{padding:8px}.empty{padding:20px;text-align:center}.hint{color:#705365;font-size:13px}
+</style></head><body>
+<header><h1>🍿 Meu Catálogo de Séries</h1><p>Organize os dramas que você já assistiu</p></header>
+<main><div class="stats">
+<div class="stat">Total<strong><br><b id="total">0</b></strong></div>
+<div class="stat">Gostei ❤️<br><b id="yes">0</b></div>
+<div class="stat">Não gostei 👎<br><b id="no">0</b></div>
+<div class="stat">Não avaliado<br><b id="pending">0</b></div></div>
+<div class="filters">
+<input id="name" placeholder="Filtrar série"><input id="country" placeholder="Filtrar país"><input id="year" placeholder="Filtrar ano">
+<input id="male" placeholder="Filtrar ator principal"><input id="female" placeholder="Filtrar atriz principal"><input id="support" placeholder="Filtrar ator secundário">
+<select id="rating"><option value="">Todas as avaliações</option><option>Gostei</option><option>Não gostei</option><option>Não avaliado</option></select>
+</div>
+<div class="table-wrap"><table><thead><tr><th>País</th><th>Ano</th><th>Série</th><th>Ator principal</th><th>Atriz principal</th><th>Ator secundário</th><th>Gostei?</th></tr></thead><tbody id="tbody"></tbody></table><div id="empty" class="empty" hidden>Nenhum resultado encontrado.</div></div>
+<p class="hint">Esta versão não salva alterações de avaliação após fechar o arquivo. Para manter a avaliação, use a planilha Excel.</p></main>
+<script>
+const dramas=[{"country": "Coreia do Sul", "year": 2026, "name": "De Repente Humana", "male": "Lomon (Park Solomon)", "female": "Kim Hye-yoon", "support": "Lee Si-woo", "liked": "Não avaliado"}, {"country": "Coreia do Sul", "year": 2026, "name": "Namorado por Assinatura", "male": "Seo In-guk", "female": "Jisoo (Kim Ji-soo)", "support": "Seo Kang-jun", "liked": "Não avaliado"}];
+const ids=['name','country','year','male','female','support','rating'];
+function safe(v){return String(v??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));}
+function update(){let f=ids.map(x=>document.getElementById(x).value.trim().toLowerCase());
+let arr=dramas.filter(d=>{let vals=[d.name,d.country,d.year,d.male,d.female,d.support].map(x=>String(x).toLowerCase());
+return vals.every((v,i)=>!f[i]||v.includes(f[i])) && (!f[6]||d.liked.toLowerCase()===f[6]);});
+document.getElementById('tbody').innerHTML=arr.map(d=>`<tr><td>${safe(d.country)}</td><td>${safe(d.year)}</td><td>${safe(d.name)}</td><td>${safe(d.male)}</td><td>${safe(d.female)}</td><td>${safe(d.support)}</td><td>${safe(d.liked)}</td></tr>`).join('');
+document.getElementById('empty').hidden=arr.length>0;
+document.getElementById('total').textContent=dramas.length;
+document.getElementById('yes').textContent=dramas.filter(x=>x.liked==='Gostei').length;
+document.getElementById('no').textContent=dramas.filter(x=>x.liked==='Não gostei').length;
+document.getElementById('pending').textContent=dramas.filter(x=>x.liked==='Não avaliado').length;
+}
+ids.forEach(id=>document.getElementById(id).addEventListener('input',update));
+ids.forEach(id=>document.getElementById(id).addEventListener('change',update));
+update();
+</script></body></html>
